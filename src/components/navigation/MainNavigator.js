@@ -13,7 +13,7 @@ const Tab = createBottomTabNavigator();
 export default function MainNavigator() {
   return (
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{ tabBarStyle: { height: 55 }, }} initialRouteName="Settings">
+      <Tab.Navigator screenOptions={{ tabBarStyle: { height: 55 }, }} initialRouteName="">
         <Tab.Screen
           options={{
             headerShown: false,
@@ -59,7 +59,7 @@ export default function MainNavigator() {
             headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Icon
-                source="cog"
+                source="settings-helper"
                 size={30}
               />
             ),
