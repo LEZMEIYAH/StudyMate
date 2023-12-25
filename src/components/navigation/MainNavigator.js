@@ -3,7 +3,7 @@ import { Icon } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import TaskDetailsScreen from "../screens/Task/TaskDetailsScreen";
+import TaskScreen from "../screens/Task/TaskScreen";
 import TimerScreen from "../screens/Timer/TimerScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
@@ -38,7 +38,7 @@ export default function MainNavigator() {
             ),
           }}
           name="Task"
-          component={TaskDetailsScreen}
+          component={TaskScreen}
         />
         <Tab.Screen
           options={{
