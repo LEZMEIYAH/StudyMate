@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import RNPickerSelect from "react-native-picker-select";
 import TaskList from "../../forms/TaskList";
 import TaskModal from "../../forms/TaskModel";
 import styles from "../../../config/styles";
@@ -12,23 +13,28 @@ const TaskScreen = () => {
     status: "Pending",
     deadline: "",
     createdAt: "",
+    category: "",
+    newCategory: "",
   });
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [validationError, setValidationError] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]); // Added filteredTasks state
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   const handleAddTask = () => { 
     if ( 
-      task.title.trim() !== "" && 
-      task.deadline !== ""
+      task.title.trim() !== "" &&
+      task.deadline !== "" &&
+      (task.category.trim() !== "" || task.newCategory.trim() !== "")  // Ensure category is not empty
     ) { 
       const currentDate = new Date(); 
-      const formattedDate = 
-        currentDate.toLocaleString(); 
+      const formattedDate = currentDate.toLocaleString(); 
 
       if (editingTask) { 
           
-            // If editing an existing task, update it 
+        // If editing an existing task, update it 
         const updatedTasks = tasks.map((t) => 
           t.id === editingTask.id 
             ? { ...t, ...task } 
@@ -56,6 +62,8 @@ const TaskScreen = () => {
         status: "Pending", 
         deadline: "", 
         createdAt: "", 
+        category: "",
+        newCategory: "",
       }); 
           
       // Close the modal 
@@ -72,22 +80,31 @@ const TaskScreen = () => {
 
   // Function to handle task editing 
   const handleEditTask = (task) => { 
-  
-    // Set the task being edited 
-    setEditingTask(task);  
-      
-    // Pre-fill the input with task data 
-    setTask(task);  
-      
+
+    // Ensure that date and time values are preserved without modification
+    setTask((prevTask) => {
+      // Copy over all properties from the existing task
+      const updatedTask = { ...prevTask };
+
+      // Copy over properties from the task being edited
+      for (const key in task) {
+        if (task.hasOwnProperty(key)) {
+          updatedTask[key] = task[key];
+        }
+      }
+
+      return updatedTask;
+
+    });  
+
+    setEditingTask(task);
     // Open the modal for editing 
     setModalVisible(true);  
   }; 
 
   // Function to delete a task 
   const handleDeleteTask = (taskId) => { 
-    const updatedTasks = tasks.filter( 
-      (t) => t.id !== taskId 
-    ); 
+    const updatedTasks = tasks.filter((t) => t.id !== taskId); 
     setTasks(updatedTasks); 
   }; 
 
@@ -98,26 +115,88 @@ const TaskScreen = () => {
         ? { 
             ...t, 
             status: 
-              t.status === "Pending"
-                ? "Completed"
-                : "Pending", 
+              t.status === "Pending" ? "Completed" : "Pending", 
           } 
         : t 
     ); 
     setTasks(updatedTasks); 
   };
 
-  // Return the JSX for rendering the component 
+  // Function to handle category filtering
+  const handleFilterByCategory = (selectedCategory) => {
+    if (selectedCategory === "All") {
+      // Display all tasks when "All" category is selected
+      setFilteredTasks(tasks);
+    } else {
+      // Filter tasks based on the selected category
+      const filteredTasks = tasks.filter(
+        (t) => t.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+      setFilteredTasks(filteredTasks);
+    }
+    setSelectedCategory(selectedCategory);
+  };
+
+  // Display categories at the top
+  const renderCategories = () => {
+    return (
+      <ScrollView horizontal style={styles.categoryList}
+      >
+        {/* Add "All" category to display all tasks */}
+        <TouchableOpacity
+          style={[
+            styles.categoryItem,
+            selectedCategory === "All" && styles.selectedCategory,
+          ]}
+          onPress={() => handleFilterByCategory("All")}
+        >
+          <Text style={styles.categoryText}>All</Text>
+        </TouchableOpacity>
+
+        {/* Display other categories */}
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryItem,
+              selectedCategory === category && styles.selectedCategory,
+            ]}
+            onPress={() => handleFilterByCategory(category)}
+          >
+            <Text style={styles.categoryText}>{category}</Text>
+          </TouchableOpacity>
+        ))}
+
+        {/* Use react-native-picker-select for selecting or adding a category */}
+        <View style={styles.pickerContainer}>
+          <RNPickerSelect
+            onValueChange={(value) => handleCategoryChange(value)}
+            items={categories.map((category) => ({
+              label: category,
+              value: category,
+            }))}
+          />
+        </View>
+
+      </ScrollView>
+    );
+  };
+  // Render the JSX for the component 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Task Manager</Text>
-      {/* Render the TaskList component */} 
+
+      {/* Render categories at the top */}
+      {renderCategories()}
+
+      {/* Render the TaskList component with filtered tasks */} 
       <TaskList
-        tasks={tasks}
+        tasks={filteredTasks}
         handleEditTask={handleEditTask}
         handleToggleCompletion={handleToggleCompletion}
         handleDeleteTask={handleDeleteTask}
       />
+
       {/* Button to add or edit tasks */} 
       <TouchableOpacity
         style={styles.addButton}
@@ -129,6 +208,8 @@ const TaskScreen = () => {
             status: "Pending",
             deadline: "",
             createdAt: "",
+            category: "",
+            newCategory: "",
           });
           setModalVisible(true);
           setValidationError(false);
@@ -138,6 +219,7 @@ const TaskScreen = () => {
           {editingTask ? "Edit Task" : "Add Task"}
         </Text>
       </TouchableOpacity>
+
       {/* Render the TaskModal component */} 
       <TaskModal
         modalVisible={modalVisible}
@@ -152,11 +234,15 @@ const TaskScreen = () => {
             status: "Pending",
             deadline: "",
             createdAt: "",
+            category: "",
+            newCategory: "",
           });
           setModalVisible(false);
           setValidationError(false);
         }}
         validationError={validationError}
+        categories={categories}
+        setCategories={setCategories}
       />
     </View>
   );

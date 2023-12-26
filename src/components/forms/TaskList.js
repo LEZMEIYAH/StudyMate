@@ -25,14 +25,13 @@ const TaskList = ({
                     // Pass functions to handle editing,  
                     // toggling completion, and deletion 
                     handleEditTask={handleEditTask} 
-                    handleToggleCompletion={ 
-                        handleToggleCompletion 
-                    } 
+                    handleToggleCompletion={handleToggleCompletion} 
                     handleDeleteTask={handleDeleteTask} 
                 /> 
             ))} 
         </ScrollView> 
     ); 
 }; 
+
 // Export the TaskList component 
 export default TaskList;

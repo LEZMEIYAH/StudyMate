@@ -16,7 +16,13 @@ const TaskModal = ({
     handleAddTask, 
     handleCancel, 
     validationError, 
+    categories,  
+    setCategories,  
 }) => { 
+    const handleCategoryChange = (selectedCategory) => {
+        setTask({ ...task, category: selectedCategory });
+    };
+
     return ( 
         <Modal 
             visible={modalVisible} 
@@ -29,8 +35,7 @@ const TaskModal = ({
                     style={styles.input} 
                     placeholder="Title"
                     value={task.title} 
-                    onChangeText={(text) => 
-                        setTask({ ...task, title: text }) 
+                    onChangeText={(text) => setTask({ ...task, title: text }) 
                     } 
                     // Update the title when text changes
                     /> 
@@ -47,9 +52,37 @@ const TaskModal = ({
                     }
                 /> 
 
-                <Text style={styles.inputLabel}> 
-                    Deadline: 
-                </Text> 
+                <TextInput 
+                    style={styles.input} 
+                    placeholder="Category"
+                    value={task.category} 
+                    onChangeText={(text) => setTask({ ...task, category: text }) 
+                    } 
+                />
+
+                {/* Dropdown for existing categories */}
+                <Picker
+                    selectedValue={task.category}
+                    style={styles.input}
+                    onValueChange={(itemValue, itemIndex) =>
+                        handleCategoryChange(itemValue)
+                    }
+                >
+                <Picker.Item label="Select Category" value="" />
+                    {categories.map((category) => (
+                        <Picker.Item key={category} label={category} value={category} />
+                    ))}
+                </Picker>
+
+                {/* Input field for adding a new category */}
+                <TextInput
+                    style={styles.input}
+                    placeholder="New Category"
+                    value={task.newCategory}
+                    onChangeText={(text) => setTask({ ...task, newCategory: text })}
+                />
+
+                <Text style={styles.inputLabel}> Deadline: </Text> 
                 <DatePicker 
                     style={styles.datePicker} 
                     mode="datepicker"
@@ -64,18 +97,12 @@ const TaskModal = ({
                     </Text> 
                 )} 
                 <Button 
-
-                    // Display "Update" when editing an existing  
-                    // task, "Add" when adding a new task 
                     title={task.id ? "Update" : "Add"} 
-                    // Call the handleAddTask function  
-                    // when the button is pressed 
                     onPress={handleAddTask} 
-                    // Set the button color 
                     color="#007BFF"/> 
 
                 <Button 
-                    title="Cancel"
+                    title="Cancel" 
                     onPress={handleCancel} 
                     color="#FF3B30"/> 
             </View> 
