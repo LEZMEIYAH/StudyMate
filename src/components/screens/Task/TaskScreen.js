@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import TaskList from "../../forms/TaskList";
 import TaskModal from "../../forms/TaskModel";
 import styles from "../../../config/styles";
@@ -14,7 +13,6 @@ const TaskScreen = () => {
     deadline: "",
     createdAt: "",
     category: "",
-    newCategory: "",
   });
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -27,7 +25,7 @@ const TaskScreen = () => {
     if ( 
       task.title.trim() !== "" &&
       task.deadline !== "" &&
-      (task.category.trim() !== "" || task.newCategory.trim() !== "")  // Ensure category is not empty
+      task.category.trim() !== ""  // Ensure category is not empty
     ) { 
       const currentDate = new Date(); 
       const formattedDate = currentDate.toLocaleString(); 
@@ -63,7 +61,6 @@ const TaskScreen = () => {
         deadline: "", 
         createdAt: "", 
         category: "",
-        newCategory: "",
       }); 
           
       // Close the modal 
@@ -140,7 +137,9 @@ const TaskScreen = () => {
   // Display categories at the top
   const renderCategories = () => {
     return (
-      <ScrollView horizontal style={styles.categoryList}
+      <ScrollView 
+        horizontal 
+        style={styles.categoryList}
       >
         {/* Add "All" category to display all tasks */}
         <TouchableOpacity
@@ -166,18 +165,6 @@ const TaskScreen = () => {
             <Text style={styles.categoryText}>{category}</Text>
           </TouchableOpacity>
         ))}
-
-        {/* Use react-native-picker-select for selecting or adding a category */}
-        <View style={styles.pickerContainer}>
-          <RNPickerSelect
-            onValueChange={(value) => handleCategoryChange(value)}
-            items={categories.map((category) => ({
-              label: category,
-              value: category,
-            }))}
-          />
-        </View>
-
       </ScrollView>
     );
   };
@@ -209,7 +196,6 @@ const TaskScreen = () => {
             deadline: "",
             createdAt: "",
             category: "",
-            newCategory: "",
           });
           setModalVisible(true);
           setValidationError(false);
@@ -235,14 +221,11 @@ const TaskScreen = () => {
             deadline: "",
             createdAt: "",
             category: "",
-            newCategory: "",
           });
           setModalVisible(false);
           setValidationError(false);
         }}
         validationError={validationError}
-        categories={categories}
-        setCategories={setCategories}
       />
     </View>
   );
