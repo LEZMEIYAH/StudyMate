@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from "react-native";
 import TaskList from "../../forms/TaskList";
-import TaskModal from "../../forms/TaskModel";
-import styles from "../../../config/styles";
+import TaskModal from "../../forms/TaskModal";
+import styles from "../../../config/TaskStyles";
 
 const TaskScreen = () => {
   const [tasks, setTasks] = useState([]);
@@ -20,33 +20,65 @@ const TaskScreen = () => {
   const [categories, setCategories] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]); // Added filteredTasks state
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [newCategory, setNewCategory] = useState("");
 
-  const handleAddTask = () => { 
-    if ( 
-      task.title.trim() !== "" &&
-      task.deadline !== "" &&
-      task.category.trim() !== ""  // Ensure category is not empty
-    ) { 
+  const handleAddTask = () => {
+    setEditingTask(null);
+    setTask({
+      title: "",
+      description: "",
+      status: "Pending",
+      deadline: "",
+      createdAt: "",
+      category: "",
+    });
+    setModalVisible(true);
+    setValidationError(false);
+  };
+
+  const handleAddCategory = () => {
+    if (newCategory.trim() !== "") {
+      // Check if the category already exists
+      if (!categories.includes(newCategory)) {
+        setCategories([...categories, newCategory]);
+        setTask({ ...task, category: newCategory });
+        setNewCategory("");
+        setModalVisible(true);
+      } else {
+        // Display an alert or handle it as needed
+        alert("Category already exists!");
+      }
+    }
+  };
+
+  const handleAddTaskAndCategory = () => {
+    // Check if a new category is provided and not empty
+    if (newCategory.trim() !== "") {
+      // Check if the category already exists
+      if (!categories.includes(newCategory)) {
+        // Add the new category to the list
+        setCategories([...categories, newCategory]);
+      } else {
+        // Handle the case where the category already exists
+        alert("Category already exists!");
+        return;
+      }
+    }
+
+    if (task.title.trim() !== "" && task.deadline !== "" && task.category.trim() !== "" ) { 
       const currentDate = new Date(); 
       const formattedDate = currentDate.toLocaleString(); 
 
       if (editingTask) { 
-          
         // If editing an existing task, update it 
-        const updatedTasks = tasks.map((t) => 
-          t.id === editingTask.id 
-            ? { ...t, ...task } 
-            : t 
-        ); 
+        const updatedTasks = tasks.map((t) => t.id === editingTask.id ? { ...t, ...task } : t ); 
         setTasks(updatedTasks); 
         setEditingTask(null); 
       } else { 
-          
         // If adding a new task, create it 
         const newTask = { 
           id: Date.now(), 
           ...task, 
-                  
           // Set the creation date and time as a string 
           createdAt: formattedDate,  
         }; 
@@ -89,11 +121,8 @@ const TaskScreen = () => {
           updatedTask[key] = task[key];
         }
       }
-
       return updatedTask;
-
     });  
-
     setEditingTask(task);
     // Open the modal for editing 
     setModalVisible(true);  
@@ -111,8 +140,7 @@ const TaskScreen = () => {
       t.id === taskId 
         ? { 
             ...t, 
-            status: 
-              t.status === "Pending" ? "Completed" : "Pending", 
+            status: t.status === "Pending" ? "Completed" : "Pending", 
           } 
         : t 
     ); 
@@ -137,10 +165,7 @@ const TaskScreen = () => {
   // Display categories at the top
   const renderCategories = () => {
     return (
-      <ScrollView 
-        horizontal 
-        style={styles.categoryList}
-      >
+      <ScrollView horizontal style={styles.categoryList}>
         {/* Add "All" category to display all tasks */}
         <TouchableOpacity
           style={[
@@ -165,15 +190,16 @@ const TaskScreen = () => {
             <Text style={styles.categoryText}>{category}</Text>
           </TouchableOpacity>
         ))}
+        
       </ScrollView>
     );
   };
+
   // Render the JSX for the component 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Task Manager</Text>
-
-      {/* Render categories at the top */}
+      
       {renderCategories()}
 
       {/* Render the TaskList component with filtered tasks */} 
@@ -186,7 +212,7 @@ const TaskScreen = () => {
 
       {/* Button to add or edit tasks */} 
       <TouchableOpacity
-        style={styles.addButton}
+        style={styles.addButton} 
         onPress={() => {
           setEditingTask(null);
           setTask({
@@ -197,16 +223,15 @@ const TaskScreen = () => {
             createdAt: "",
             category: "",
           });
+          setNewCategory("");
           setModalVisible(true);
           setValidationError(false);
         }}
       >
-        <Text style={styles.addButtonText}>
-          {editingTask ? "Edit Task" : "Add Task"}
-        </Text>
+        <Text style={styles.addButtonText}>Add Task</Text>
       </TouchableOpacity>
 
-      {/* Render the TaskModal component */} 
+      {/* Render the TaskModal component */}
       <TaskModal
         modalVisible={modalVisible}
         task={task}
@@ -222,10 +247,16 @@ const TaskScreen = () => {
             createdAt: "",
             category: "",
           });
+          setNewCategory("");
           setModalVisible(false);
           setValidationError(false);
         }}
         validationError={validationError}
+        categories={categories}
+        setNewCategory={setNewCategory}
+        newCategory={newCategory}
+        handleAddCategory={handleAddCategory} // Pass the function to handle adding a category in modal
+        handleAddTaskAndCategory={handleAddTaskAndCategory}
       />
     </View>
   );

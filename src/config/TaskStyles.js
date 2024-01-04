@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
         // desired spacing 
         marginVertical: 2,  
     }, 
-  
     editButton: { 
         backgroundColor: "#007BFF", 
         borderRadius: 5, 
@@ -128,6 +127,49 @@ const styles = StyleSheet.create({
     taskCreatedAt: { 
         color: "#5497FF", 
     }, 
+    categoryList: {
+        flexDirection: "row",
+        marginBottom: 480,
+    },
+    categoryItem: {
+        padding: 10,
+        marginHorizontal: 5,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: "#007BFF",
+    },
+    selectedCategory: {
+        backgroundColor: "#007BFF",
+    },
+    categoryText: {
+        color: "#007BFF",
+        fontWeight: "bold",
+    },
+    newCategoryContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    newCategoryInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        padding: 10,
+        borderRadius: 5,
+        fontSize: 16,
+        marginRight: 10,
+    },
+    addButton: {
+        backgroundColor: "#007BFF",
+        padding: 10,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    addButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
 }); 
 
 export default styles;
